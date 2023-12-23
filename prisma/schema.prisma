@@ -1,0 +1,39 @@
+generator client {
+        provider = "prisma-client-js"
+}
+
+datasource db {
+        provider = "postgresql"
+        url      = env("DB_URL")
+}
+
+model Product {
+        productId       String            @id @default(uuid())
+        product_name    String
+        price           String
+        count           Int
+        categories      Category[]
+        createdAt       DateTime          @default(now())
+        updatedAt       DateTime          @updatedAt
+        ProductCategory ProductCategory[]
+}
+
+model Category {
+        catId           String            @id @default(uuid())
+        title           String
+        parent          Category          @relation("parents", fields: [parentId], references: [catId])
+        parentId        String
+        childs          Category[]        @relation("parents")
+        Product         Product?          @relation(fields: [productId], references: [productId])
+        productId       String
+        ProductCategory ProductCategory[]
+}
+
+model ProductCategory {
+        productId String
+        catId     String
+        product   Product  @relation(fields: [productId], references: [productId])
+        category  Category @relation(fields: [catId], references: [catId])
+
+        @@id([productId, catId])
+}
